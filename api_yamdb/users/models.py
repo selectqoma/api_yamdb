@@ -64,7 +64,7 @@ class User(AbstractUser):
         return self.role == 'admin'
 
     USERNAME_FIELD = 'username'
-    EMAIL_FIELD = 'email'
+    REQUIRED_FIELDS = ['email',]
 
     def __str__(self):
         return self.email
