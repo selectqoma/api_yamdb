@@ -3,6 +3,7 @@ from django.db import models
 
 import uuid
 
+
 ADMIN = 'admin'
 MODERATOR = 'moderator'
 USER = 'user'
