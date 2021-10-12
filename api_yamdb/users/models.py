@@ -57,6 +57,12 @@ class User(AbstractUser):
         editable=False,
     )
 
+    def is_moderator(self):
+        return self.role == 'moderator'
+
+    def is_admin(self):
+        return self.role == 'admin'
+
     USERNAME_FIELD = 'username'
     EMAIL_FIELD = 'email'
 
