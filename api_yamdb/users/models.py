@@ -11,7 +11,7 @@ USER = 'user'
 
 class User(AbstractUser):
 
-    USER_TYPES = [
+    USER_ROLES = [
             (ADMIN, 'Администратор'),
             (MODERATOR, 'Модератор'),
             (USER, 'Пользователь'),
@@ -38,10 +38,10 @@ class User(AbstractUser):
         blank=True,
     )
 
-    user_type = models.CharField(
+    role = models.CharField(
         max_length=10,
         verbose_name='Тип пользователя',
-        choices=USER_TYPES,
+        choices=USER_ROLES,
         default=USER,
     )
 
