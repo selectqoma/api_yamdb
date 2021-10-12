@@ -1,12 +1,42 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
 import uuid
 
-
 ADMIN = 'admin'
 MODERATOR = 'moderator'
 USER = 'user'
+
+
+class UserManager(BaseUserManager):
+    def create_user(self, email, username, **extra_fields):
+        if not email:
+            raise ValueError('Введите адрес электронной почты')
+        if not username:
+            raise ValueError('Введите имя пользователя')
+        user = self.model(
+            email=self.normalize_email(email),
+            username=username,
+            **extra_fields
+        )
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, username, **extra_fields):
+        if not email:
+            raise ValueError('Введите адрес электронной почты')
+        if not username:
+            raise ValueError('Введите имя пользователя')
+        user = self.model(
+            email=self.normalize_email(email),
+            username=username,
+            role='admin',
+            **extra_fields
+        )
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(using=self._db)
+        return user
 
 
 class User(AbstractUser):
@@ -63,11 +93,13 @@ class User(AbstractUser):
     def is_admin(self):
         return self.role == 'admin'
 
+    objects = UserManager()
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email',]
 
     def __str__(self):
-        return self.email
+        return self.username
 
     class Meta:
         ordering = ('username',)
