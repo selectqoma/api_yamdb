@@ -22,6 +22,8 @@ class IsModerator(permissions.BasePermission):
     """Проверяет, является ли пользователь модератором."""
 
     def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
         return request.user.role == 'moderator'
 
 
@@ -29,4 +31,6 @@ class IsAdmin(permissions.BasePermission):
     """Проверяет, является ли пользователь админом."""
 
     def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
         return request.user.role == 'admin'
