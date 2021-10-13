@@ -36,4 +36,3 @@ class UserSerializer(serializers.ModelSerializer):
                   'role'
                   ]
         read_only_fields = ('role', )
-
