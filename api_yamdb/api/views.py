@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 import uuid
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import AccessToken
+from .permissions import IsAdmin
 
 
 @api_view(['POST'])
@@ -53,6 +54,7 @@ class AdminViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_fields = ('role', )
+    permission_classes = (IsAdmin, )
     filter_backends = [filters.SearchFilter]
     search_fields = ['user__username', ]
 
