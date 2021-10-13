@@ -22,7 +22,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, **extra_fields):
+    def create_superuser(self, email, username, password, **extra_fields):
         if not email:
             raise ValueError('Введите адрес электронной почты')
         if not username:
@@ -35,6 +35,7 @@ class UserManager(BaseUserManager):
         )
         user.is_staff = True
         user.is_superuser = True
+        user.set_password(password)
         user.save(using=self._db)
         return user
 
