@@ -61,24 +61,24 @@ def get_token(request):
 class AdminViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = AdminUserSerializer
-    filter_fields = ('role', )
+    filter_fields = ('role',)
     lookup_field = 'username'
     permission_classes = (IsAdmin, )
     filter_backends = [filters.SearchFilter]
-    search_fields = ['user__username', ]
+    search_fields = ['username', 'email']
 
 
 class UserInfo(APIView):
     def get(self, request):
         if request.user.is_authenticated:
-            user = get_object_or_404(User, id=request.user.id)
+            user = get_object_or_404(User, username=request.user.username)
             serializer = UserSerializer(user)
             return Response(serializer.data)
         return Response('Вы не авторизированы', status=status.HTTP_401_UNAUTHORIZED)
 
     def patch(self, request):
         if request.user.is_authenticated:
-            user = get_object_or_404(User, id=request.user.id)
+            user = get_object_or_404(User, username=request.user.username)
             serializer = UserSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
