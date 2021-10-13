@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from users.models import User
 
 
 class SendCodeSerializer(serializers.Serializer):
@@ -11,8 +12,17 @@ class LogInSerializer(serializers.Serializer):
     confirmation_code = serializers.CharField(required=True)
 
 
-class UserSerializer(serializers.Serializer):
+class AdminUserSerializer(serializers.ModelSerializer):
+
     class Meta:
+        model = User
+        fields = ("first_name", "last_name", "username",
+                  "bio", "email", "role")
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
         fields = ['username',
                   'email',
                   'bio',
@@ -20,3 +30,4 @@ class UserSerializer(serializers.Serializer):
                   'last_name',
                   'role'
                   ]
+        read_only_fields = ('role', )

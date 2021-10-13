@@ -22,11 +22,15 @@ class IsModerator(permissions.BasePermission):
     """Проверяет, является ли пользователь модератором."""
 
     def has_permission(self, request, view):
-        return request.user.role == 'moderator'
+        return (request.user.is_authenticated
+                and request.user.role == 'moderator')
 
 
 class IsAdmin(permissions.BasePermission):
     """Проверяет, является ли пользователь админом."""
 
     def has_permission(self, request, view):
-        return request.user.role == 'admin'
+        if not request.user.is_authenticated:
+            return False
+        return (request.user.role == 'admin'
+                or request.user.is_superuser)
