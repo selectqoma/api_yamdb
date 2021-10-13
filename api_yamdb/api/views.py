@@ -1,15 +1,15 @@
 from .serializers import (
-    SendCodeSerializer, LogInSerializer, UserSerializer
+    SendCodeSerializer, LogInSerializer, UserSerializer, AdminUserSerializer
 )
 from users.models import User
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django.core.mail import send_mail
 from rest_framework import status, viewsets, filters
 from rest_framework.views import APIView
 import uuid
 from django.shortcuts import get_object_or_404
-from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken
 from .permissions import IsAdmin
 
 
@@ -20,17 +20,16 @@ def send_code(request):
     username = request.data.get('username')
     confirmation_code = str(uuid.uuid4())
     if serializer.is_valid():
-        user = User.objects.filter(username=username).exists()
-        if not user:
+        if not User.objects.filter(email=email).exists():
             User.objects.create_user(email=email, username=username)
-        User.objects.filter(username=username).update(
-            confirmation_code=confirmation_code
-        )
+        else:
+            user = User.objects.filter(username=username)
+            user.confirmation_code = confirmation_code
         mail_subject = 'API_Yamdb: Ваш код для авторизации'
         mail_message = f'Скопируйте код: {confirmation_code}'
         send_mail(mail_subject, mail_message, 'API_Yamdb <admin@yamdb.ru>', (email,))
         return Response(
-            f'Проверьте вашу почту, код был отправлен на {email}',
+            request.data,
             status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -43,7 +42,7 @@ def get_token(request):
         confirmation_code = serializer.data.get('confirmation_code')
         user = get_object_or_404(User, username=username)
         if confirmation_code == str(user.confirmation_code):
-            token = AccessToken.for_user(user)
+            token = RefreshToken.for_user(user)
             return Response({f'Ваш токен: {token}'}, status=status.HTTP_200_OK)
         return Response('Неправильный код',
                         status=status.HTTP_400_BAD_REQUEST)
@@ -52,8 +51,9 @@ def get_token(request):
 
 class AdminViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = AdminUserSerializer
     filter_fields = ('role', )
+    lookup_field = 'username'
     permission_classes = (IsAdmin, )
     filter_backends = [filters.SearchFilter]
     search_fields = ['user__username', ]
@@ -65,7 +65,7 @@ class UserInfo(APIView):
             user = get_object_or_404(User, id=request.user.id)
             serializer = UserSerializer(user)
             return Response(serializer.data)
-        return Response('Вы не авторизованы', status=status.HTTP_401_UNAUTHORIZED)
+        return Response('Вы не авторизированы', status=status.HTTP_401_UNAUTHORIZED)
 
     def patch(self, request):
         if request.user.is_authenticated:
@@ -75,4 +75,4 @@ class UserInfo(APIView):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response('Вы не авторизованы', status=status.HTTP_401_UNAUTHORIZED)
+        return Response('Вы не авторизированы', status=status.HTTP_401_UNAUTHORIZED)

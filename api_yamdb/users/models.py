@@ -28,11 +28,11 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             username=username,
-            role='admin',
+            is_staff=True,
+            is_superuser=True,
             **extra_fields
         )
-        user.is_staff = True
-        user.is_superuser = True
+
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -53,6 +53,11 @@ class User(AbstractUser):
         blank=False,
         null=False
     )
+
+    username = models.CharField(
+        verbose_name='Имя пользователя',
+        max_length=50,
+        unique=True)
 
     first_name = models.CharField(
         max_length=150,
