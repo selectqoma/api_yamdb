@@ -1,13 +1,9 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 from users.models import User
 
 
 class SendCodeSerializer(serializers.Serializer):
-    email = serializers.EmailField(
-        required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
-    )
+    email = serializers.EmailField(required=True)
     username = serializers.CharField(required=True)
 
     def validate_username(self, value):
