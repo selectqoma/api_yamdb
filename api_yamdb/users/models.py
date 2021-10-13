@@ -84,7 +84,7 @@ class User(AbstractUser):
 
     confirmation_code = models.UUIDField(
         verbose_name='Код подтверждения',
-        default=uuid.uuid4,
+        default=0,
         editable=False,
     )
 
