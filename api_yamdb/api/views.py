@@ -20,14 +20,23 @@ def send_code(request):
     username = request.data.get('username')
     confirmation_code = str(uuid.uuid4())
     if serializer.is_valid():
-        if not User.objects.filter(email=email).exists():
-            User.objects.create_user(email=email, username=username)
-        else:
-            user = User.objects.filter(username=username)
+
+        if User.objects.filter(email=email, username=username).exists():
+            user = User.objects.get(email=email, username=username)
             user.confirmation_code = confirmation_code
+        else:
+            if User.objects.filter(
+                    email=email
+            ).exists() or User.objects.filter(username=username).exists():
+                return Response(
+                    {'error': 'Такой пользователь уже существует'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            User.objects.create_user(email=email, username=username)
         mail_subject = 'API_Yamdb: Ваш код для авторизации'
         mail_message = f'Скопируйте код: {confirmation_code}'
-        send_mail(mail_subject, mail_message, 'API_Yamdb <admin@yamdb.ru>', (email,))
+        send_mail(mail_subject, mail_message, 'API_Yamdb <admin@yamdb.ru>',
+                  (email,))
         return Response(
             request.data,
             status=status.HTTP_200_OK)
@@ -52,9 +61,9 @@ def get_token(request):
 class AdminViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = AdminUserSerializer
-    filter_fields = ('role', )
+    filter_fields = ('role',)
     lookup_field = 'username'
-    permission_classes = (IsAdmin, )
+    permission_classes = (IsAdmin,)
     filter_backends = [filters.SearchFilter]
     search_fields = ['user__username', ]
 
@@ -65,7 +74,8 @@ class UserInfo(APIView):
             user = get_object_or_404(User, id=request.user.id)
             serializer = UserSerializer(user)
             return Response(serializer.data)
-        return Response('Вы не авторизированы', status=status.HTTP_401_UNAUTHORIZED)
+        return Response('Вы не авторизированы',
+                        status=status.HTTP_401_UNAUTHORIZED)
 
     def patch(self, request):
         if request.user.is_authenticated:
@@ -74,5 +84,7 @@ class UserInfo(APIView):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response('Вы не авторизированы', status=status.HTTP_401_UNAUTHORIZED)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+        return Response('Вы не авторизированы',
+                        status=status.HTTP_401_UNAUTHORIZED)

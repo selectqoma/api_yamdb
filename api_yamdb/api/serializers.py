@@ -6,6 +6,11 @@ class SendCodeSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     username = serializers.CharField(required=True)
 
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('Неверное имя пользователя')
+        return value
+
 
 class LogInSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
@@ -31,3 +36,4 @@ class UserSerializer(serializers.ModelSerializer):
                   'role'
                   ]
         read_only_fields = ('role', )
+
