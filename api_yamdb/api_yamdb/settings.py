@@ -24,7 +24,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'users',
-    'django_filters'
+    'django_filters',
     'titles.apps.TitlesConfig',
 ]
 
