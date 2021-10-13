@@ -17,6 +17,9 @@ class Category(models.Model):
     class Meta:
         ordering = ('slug',)
 
+    def __str__(self):
+        return self.name
+
 
 class Genre(models.Model):
     slug = models.SlugField(
@@ -26,6 +29,9 @@ class Genre(models.Model):
 
     class Meta:
         ordering = ('slug',)
+
+    def __str__(self):
+        return self.slug
 
 
 class Title(models.Model):
@@ -49,3 +55,6 @@ class Title(models.Model):
 
     class Meta:
         ordering = ('-year',)
+
+    def __str__(self):
+        return self.name
