@@ -1,10 +1,19 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from users.models import User
 
 
 class SendCodeSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
     username = serializers.CharField(required=True)
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('Неверное имя пользователя')
+        return value
 
 
 class LogInSerializer(serializers.Serializer):
@@ -13,7 +22,6 @@ class LogInSerializer(serializers.Serializer):
 
 
 class AdminUserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ("first_name", "last_name", "username",
@@ -30,4 +38,4 @@ class UserSerializer(serializers.ModelSerializer):
                   'last_name',
                   'role'
                   ]
-        read_only_fields = ('role', )
+        read_only_fields = ('role',)
