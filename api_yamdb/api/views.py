@@ -30,18 +30,11 @@ def send_code(request):
             user = User.objects.get(email=email, username=username)
             user.confirmation_code = confirmation_code
         else:
-            if User.objects.filter(
-                    email=email
-            ).exists() or User.objects.filter(username=username).exists():
-                return Response(
-                    {'error': 'Такой пользователь уже существует'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
             User.objects.create_user(email=email, username=username)
         mail_subject = 'API_Yamdb: Ваш код для авторизации'
         mail_message = f'Скопируйте код: {confirmation_code}'
         send_mail(mail_subject, mail_message, 'API_Yamdb <admin@yamdb.ru>',
-                  (email,))
+                  (email,), fail_silently=True)
         return Response(
             request.data,
             status=status.HTTP_200_OK)

@@ -13,6 +13,17 @@ class SendCodeSerializer(serializers.Serializer):
             raise serializers.ValidationError('Неверное имя пользователя')
         return value
 
+    def validate(self, attrs):
+        username_exists = User.objects.filter(
+            username=attrs['username']).exists()
+        email_exists = User.objects.filter(
+            email=attrs['email']).exists()
+        if username_exists and not email_exists:
+            raise serializers.ValidationError('Такой пользователь уже есть')
+        if email_exists and not username_exists:
+            raise serializers.ValidationError('Такой пользователь уже есть')
+        return attrs
+
 
 class LogInSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
