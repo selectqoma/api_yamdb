@@ -1,5 +1,7 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from users.models import User
+from titles.models import Review
 
 
 class SendCodeSerializer(serializers.Serializer):
@@ -18,7 +20,6 @@ class LogInSerializer(serializers.Serializer):
 
 
 class AdminUserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ("first_name", "last_name", "username",
@@ -35,4 +36,23 @@ class UserSerializer(serializers.ModelSerializer):
                   'last_name',
                   'role'
                   ]
-        read_only_fields = ('role', )
+        read_only_fields = ('role',)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = (
+            'id', 'title', 'author', 'text', 'score', 'pub_date')
+        read_only_fields = ('title', 'author', 'pub_date')
+
+    def validate(self, attrs):
+        review_obj_exists = Review.objects.filter(
+            author=self.context.get('request').user,
+            title=self.context.get('view').kwargs.get('title_id')
+        ).exists()
+        if review_obj_exists and self.context.get('request').method == 'POST':
+            raise serializers.ValidationError('Вы уже оставляли отзыв')
+        return attrs
+
+
