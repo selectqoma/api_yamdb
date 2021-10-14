@@ -1,16 +1,22 @@
-from .serializers import (
-    SendCodeSerializer, LogInSerializer, UserSerializer, AdminUserSerializer
-)
-from users.models import User
+import uuid
+
+from rest_framework import filters, mixins, permissions, viewsets, status
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
-from django.core.mail import send_mail
-from rest_framework import status, viewsets, filters
-from rest_framework.views import APIView
-import uuid
-from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.views import APIView
+
+
+from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
+
+from .serializers import (
+    SendCodeSerializer, LogInSerializer, UserSerializer, AdminUserSerializer,
+    CategorySerializer, GenreSerializer, TitleSerializer
+)
+from users.models import User
 from .permissions import IsAdmin
+from titles.models import Category, Genre, Title
 
 
 @api_view(['POST'])
@@ -85,3 +91,28 @@ class UserInfo(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response('Вы не авторизированы', status=status.HTTP_401_UNAUTHORIZED)
+
+
+class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
+                   mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    serializer_class = GenreSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=name',)
+    queryset = Genre.objects.all()
+    lookup_field = 'slug'
+
+
+class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
+                      mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    serializer_class = CategorySerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=name',)
+    queryset = Category.objects.all()
+    lookup_field = 'slug'
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    serializer_class = TitleSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=category__slug', '=genre__slug', 'name', 'year')
+    queryset = Title.objects.all()
