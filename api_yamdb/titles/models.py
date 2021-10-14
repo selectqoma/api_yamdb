@@ -79,12 +79,7 @@ class Review(models.Model):
         verbose_name='Тайтл'
 
     )
-    genre = models.ForeignKey(
-        Genre,
-        on_delete=models.CASCADE,
-        related_name='reviews',
-        verbose_name='Жанр'
-    )
+
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

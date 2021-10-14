@@ -31,6 +31,6 @@ class CommentInLine(admin.TabularInline):
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     """Адмнка для обзоров."""
-    list_display = ('title', 'genre', 'author', 'text', 'pub_date')
-    search_fields = ('title', 'genre', 'author', 'text')
+    list_display = ('title', 'author', 'text', 'pub_date')
+    search_fields = ('title', 'author', 'text')
     inlines = [CommentInLine, ]
