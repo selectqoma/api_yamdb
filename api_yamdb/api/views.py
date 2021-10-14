@@ -13,9 +13,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
 from .permissions import IsAdmin, IsModerator, IsAuthor, \
     IsAuthenticatedOrReadOnly
-from .serializers import ReviewSerializer
+from .serializers import ReviewSerializer, CommentSerializer
 
-from titles.models import Title
+from titles.models import Title, Review
 
 
 @api_view(['POST'])
@@ -115,4 +115,24 @@ class ReviewViewSet(viewsets.ModelViewSet):
             author=author,
             title=title
 
+        )
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = [
+        IsAuthenticatedOrReadOnly,
+        IsAuthor | IsModerator | IsAdmin
+    ]
+
+    def get_queryset(self):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        serializer.save(
+            author=self.request.user,
+            review=review
         )
