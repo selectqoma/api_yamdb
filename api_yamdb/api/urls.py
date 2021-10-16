@@ -1,6 +1,11 @@
+from django.db.models import base
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import send_code, get_token, AdminViewSet, UserInfo, ReviewViewSet, CommentViewSet
+from .views import (
+    send_code, get_token, AdminViewSet, CommentViewSet,
+    CategoryViewSet, GenreViewSet,
+    ReviewViewSet, UserInfo, TitleViewSet
+)
 
 router = DefaultRouter()
 router.register('users', AdminViewSet)
@@ -15,6 +20,9 @@ router.register(
     basename='comments'
 
 )
+router.register('genres', GenreViewSet, basename='genres')
+router.register('categories', CategoryViewSet, basename='categories')
+router.register('titles', TitleViewSet, basename='titles')
 
 urlpatterns = [
     path('v1/auth/signup/', send_code, name='get_email_code'),

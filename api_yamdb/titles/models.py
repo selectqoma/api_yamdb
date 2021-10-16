@@ -11,12 +11,13 @@ User = get_user_model()
 class Category(models.Model):
     """Модель для категории."""
     name = models.CharField(
-        'Название',
-        max_length=50
+        verbose_name='Название',
+        max_length=256
     )
     slug = models.SlugField(
-        'Slug',
-        unique=True
+        verbose_name='Slug',
+        unique=True,
+        max_length=50
     )
 
     class Meta:
@@ -28,9 +29,14 @@ class Category(models.Model):
 
 class Genre(models.Model):
     """Модель для жанров."""
+    name = models.CharField(
+        verbose_name='Название',
+        max_length=256
+    )
     slug = models.SlugField(
-        'Slug',
-        unique=True
+        verbose_name='Slug',
+        unique=True,
+        max_length=50
     )
 
     class Meta:
@@ -48,17 +54,21 @@ class Title(models.Model):
         related_name='titles',
         null=True,
     )
-    genre = models.ForeignKey(
+    genre = models.ManyToManyField(
         Genre,
-        on_delete=models.SET_NULL,
-        related_name='titles',
-        null=True
+        related_name='titles'
     )
-    name = models.CharField('Название', max_length=50)
+
+    name = models.CharField(verbose_name='Название', max_length=256)
     year = models.PositiveIntegerField(
         validators=[MaxValueValidator(
             dt.datetime.today().year, message='Неверная дата'), ]
     )
+
+    rating = models.PositiveIntegerField(
+        verbose_name='Рейтинг',
+        null=True)
+    description = models.TextField()
 
     class Meta:
         ordering = ('-year',)
