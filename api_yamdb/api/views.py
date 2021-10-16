@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 
+from reviews.models import Comment
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -15,7 +16,7 @@ from reviews.models import Category, Genre, Review, Title
 from users.models import User
 from .permissions import (
     IsAdmin, IsModerator, IsAuthor,
-    IsAuthenticatedOrReadOnly, IsAdminOrReadOnly
+    IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, AuthorOrReadOnlyPermission
 )
 from .serializers import (
     SendCodeSerializer, LogInSerializer, UserSerializer, AdminUserSerializer,
@@ -99,23 +100,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [
         IsAuthenticatedOrReadOnly,
-        IsAuthor | IsModerator | IsAdmin
+        AuthorOrReadOnlyPermission
     ]
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
         return title.reviews.all()
-
-    def perform_update(self, serializer):
-        if not self.request.user.is_superuser:
-            raise PermissionDenied('Нет доступа')
-        super(ReviewViewSet, self).perform_update(serializer)
-
-    def perform_destroy(self, serializer):
-        if not self.request.user.is_superuser:
-            raise PermissionDenied('Нет доступа')
-        super(ReviewViewSet, self).perform_destroy(serializer)
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -130,18 +121,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [
         IsAuthenticatedOrReadOnly,
-        IsAuthor | IsModerator | IsAdmin
+        AuthorOrReadOnlyPermission
     ]
-
-    def perform_update(self, serializer):
-        if not self.request.user.is_superuser:
-            raise PermissionDenied('Нет доступа')
-        super(CommentViewSet, self).perform_update(serializer)
-
-    def perform_destroy(self, serializer):
-        if not self.request.user.is_superuser:
-            raise PermissionDenied('Нет доступа')
-        super(CommentViewSet, self).perform_destroy(serializer)
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))

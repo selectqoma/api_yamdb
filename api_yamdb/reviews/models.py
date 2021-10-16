@@ -3,6 +3,7 @@ import datetime as dt
 from django.db import models
 from django.core.validators import MaxValueValidator, MaxLengthValidator
 from django.contrib.auth import get_user_model
+from django.db.models import Avg
 
 
 User = get_user_model()
@@ -68,9 +69,13 @@ class Title(models.Model):
             dt.datetime.today().year, message='Неверная дата'), ]
     )
 
-    rating = models.PositiveIntegerField(
-        verbose_name='Рейтинг',
-        null=True)
+    @property
+    def rating(self):
+        score = self.reviews.filter(
+            title=self
+        ).aggregate(Avg('score'))
+        return score['score__avg']
+
     description = models.TextField(
         blank=True,
         null=True
