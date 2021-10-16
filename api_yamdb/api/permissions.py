@@ -34,3 +34,15 @@ class IsAdmin(permissions.BasePermission):
             return False
         return (request.user.role == 'admin'
                 or request.user.is_superuser)
+
+
+class IsAdminOrReadOnly(permissions.BasePermission):
+    """Проверяет, является ли пользователь админом."""
+
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if not request.user.is_authenticated:
+            return False
+        return (request.user.role == 'admin'
+                or request.user.is_superuser)

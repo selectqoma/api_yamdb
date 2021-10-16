@@ -10,10 +10,15 @@ class GenreAdmin(admin.ModelAdmin):
     search_fields = ('slug',)
 
 
-
-
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     """Админка для категорий."""
     list_display = ('slug', 'name')
     search_fields = ('slug', 'name')
+
+
+@admin.register(Title)
+class TitleAdmin(admin.ModelAdmin):
+    """Админка для категорий."""
+    list_display = ('name', 'category')
+    search_fields = ('name',)

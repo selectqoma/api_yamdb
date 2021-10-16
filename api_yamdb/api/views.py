@@ -1,6 +1,6 @@
 import uuid
 
-from rest_framework import filters, mixins, permissions, viewsets, status
+from rest_framework import filters, mixins, viewsets, status
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -9,13 +9,15 @@ from rest_framework.views import APIView
 
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+import django_filters
 
 from .serializers import (
     SendCodeSerializer, LogInSerializer, UserSerializer, AdminUserSerializer,
     CategorySerializer, GenreSerializer, TitleSerializer
 )
 from users.models import User
-from .permissions import IsAdmin
+from .permissions import IsAdmin, IsAdminOrReadOnly
 from titles.models import Category, Genre, Title
 
 
@@ -96,6 +98,7 @@ class UserInfo(APIView):
 class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
                    mixins.DestroyModelMixin, viewsets.GenericViewSet):
     serializer_class = GenreSerializer
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('=name',)
     queryset = Genre.objects.all()
@@ -105,6 +108,7 @@ class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
 class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
                       mixins.DestroyModelMixin, viewsets.GenericViewSet):
     serializer_class = CategorySerializer
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('=name',)
     queryset = Category.objects.all()
@@ -113,6 +117,7 @@ class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
 
 class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('=category__slug', '=genre__slug', 'name', 'year')
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('category__slug', 'genre', 'name', 'year')
     queryset = Title.objects.all()

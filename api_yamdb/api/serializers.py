@@ -1,4 +1,7 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+
+from django.shortcuts import get_object_or_404
 
 from titles.models import Category, Genre, Title
 from users.models import User
@@ -41,7 +44,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    slug = serializers.SlugField(max_length=50, required=True)
+    slug = serializers.SlugField(
+        max_length=50, required=True,
+        validators=[UniqueValidator(queryset=Genre.objects.all())]
+    )
     name = serializers.CharField(max_length=256, required=True)
 
     class Meta:
@@ -50,7 +56,10 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    slug = serializers.SlugField(max_length=50, required=True)
+    slug = serializers.SlugField(
+        max_length=50, required=True,
+        validators=[UniqueValidator(queryset=Category.objects.all())]
+    )
     name = serializers.CharField(max_length=256, required=True)
 
     class Meta:
@@ -59,15 +68,21 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(required=True)
-    genre = GenreSerializer(many=True, required=True)
-    rating = serializers.IntegerField(required=False)
+    category_read = CategorySerializer(read_only=True, source='category')
+    genre_read = GenreSerializer(many=True, read_only=True, source='genre')
+    rating = serializers.IntegerField(read_only=True)
     description = serializers.CharField(required=False)
+    category = serializers.SlugField(write_only=True, required=True)
+    genre = serializers.ListField(
+        child=serializers.SlugField(max_length=50),
+        write_only=True, required=True
+    )
 
     class Meta:
         fields = (
             'id', 'name', 'year', 'rating',
-            'description', 'genre', 'category')
+            'description', 'genre_read',
+            'category_read', 'category', 'genre')
         model = Title
 
     def create(self, validated_data):
@@ -76,8 +91,9 @@ class TitleSerializer(serializers.ModelSerializer):
         title = Title.objects.create(**validated_data)
 
         if category_slug is not None:
-            category_obj = Category.objects.get(slug=category_slug)
+            category_obj = get_object_or_404(Category, slug=category_slug)
             title.category = category_obj
+            title.save()
 
         if genres:
             for genre_slug in genres:
@@ -85,3 +101,29 @@ class TitleSerializer(serializers.ModelSerializer):
                 title.genre.add(genre_obj)
 
         return title
+
+    def update(self, instance, validated_data):
+        if 'category' in validated_data:
+            category_slug = validated_data.pop('category')
+            if category_slug is not None:
+                category_obj = get_object_or_404(Category, slug=category_slug)
+                instance.category = category_obj
+        if 'genres' in validated_data:
+            genres = validated_data.pop('genre')
+            if genres:
+                instance.genre.clear()
+                for genre_slug in genres:
+                    genre_obj = Genre.objects.get(slug=genre_slug)
+                    instance.genre.add(genre_obj)
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance
+
+    def to_representation(self, value):
+        rep = super().to_representation(value)
+        rep['category'] = rep['category_read']
+        del rep['category_read']
+        rep['genre'] = rep['genre_read']
+        del rep['genre_read']
+        return rep

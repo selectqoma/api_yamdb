@@ -65,7 +65,9 @@ class Title(models.Model):
             dt.datetime.today().year, message='Неверная дата'), ]
     )
 
-    rating = models.PositiveIntegerField(verbose_name='Рейтинг')
+    rating = models.PositiveIntegerField(
+        verbose_name='Рейтинг',
+        null=True)
     description = models.TextField()
 
     class Meta:
