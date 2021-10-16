@@ -3,7 +3,7 @@ from rest_framework.validators import UniqueValidator
 
 from django.shortcuts import get_object_or_404
 
-from titles.models import Comment, Category, Genre, Review, Title
+from reviews.models import Comment, Category, Genre, Review, Title
 from users.models import User
 
 
