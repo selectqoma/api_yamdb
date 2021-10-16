@@ -31,7 +31,9 @@ class Genre(models.Model):
     """Модель для жанров."""
     name = models.CharField(
         verbose_name='Название',
-        max_length=256
+        max_length=256,
+        blank=True,
+        null=True
     )
     slug = models.SlugField(
         verbose_name='Slug',
@@ -56,7 +58,8 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         Genre,
-        related_name='titles'
+        related_name='titles',
+        blank=True,
     )
 
     name = models.CharField(verbose_name='Название', max_length=256)
@@ -68,7 +71,10 @@ class Title(models.Model):
     rating = models.PositiveIntegerField(
         verbose_name='Рейтинг',
         null=True)
-    description = models.TextField()
+    description = models.TextField(
+        blank=True,
+        null=True
+    )
 
     class Meta:
         ordering = ('-year',)
