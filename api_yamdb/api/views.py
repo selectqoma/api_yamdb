@@ -1,5 +1,5 @@
 import uuid
-
+from django.core.exceptions import PermissionDenied
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -102,11 +102,20 @@ class ReviewViewSet(viewsets.ModelViewSet):
         IsAuthor | IsModerator | IsAdmin
     ]
 
-
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
         return title.reviews.all()
+
+    def perform_update(self, serializer):
+        if not self.request.user.is_superuser:
+            raise PermissionDenied('Нет доступа')
+        super(ReviewViewSet, self).perform_update(serializer)
+
+    def perform_destroy(self, serializer):
+        if not self.request.user.is_superuser:
+            raise PermissionDenied('Нет доступа')
+        super(ReviewViewSet, self).perform_destroy(serializer)
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -114,7 +123,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer.save(
             author=author,
             title=title
-
         )
 
 
@@ -124,6 +132,16 @@ class CommentViewSet(viewsets.ModelViewSet):
         IsAuthenticatedOrReadOnly,
         IsAuthor | IsModerator | IsAdmin
     ]
+
+    def perform_update(self, serializer):
+        if not self.request.user.is_superuser:
+            raise PermissionDenied('Нет доступа')
+        super(CommentViewSet, self).perform_update(serializer)
+
+    def perform_destroy(self, serializer):
+        if not self.request.user.is_superuser:
+            raise PermissionDenied('Нет доступа')
+        super(CommentViewSet, self).perform_destroy(serializer)
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
