@@ -108,7 +108,8 @@ class Review(models.Model):
     )
     score = models.PositiveIntegerField(
         choices=SCORE_CHOICES,
-        verbose_name='оценка'
+        verbose_name='оценка',
+        unique=True
     )
     pub_date = models.DateField(auto_now_add=True)
 
@@ -136,7 +137,9 @@ class Comment(models.Model):
     )
     text = models.TextField(
         'Текст комментария',
-        validators=[MaxLengthValidator(2000, message='Превышен лимит знаков')]
+        validators=[MaxLengthValidator(
+            2000,
+            message='Превышен лимит знаков')]
     )
     pub_date = models.DateField(auto_now_add=True)
 
