@@ -102,6 +102,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         IsAuthor | IsModerator | IsAdmin
     ]
 
+
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
