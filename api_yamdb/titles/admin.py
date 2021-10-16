@@ -13,8 +13,8 @@ class GenreAdmin(admin.ModelAdmin):
 @admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
     """Админка для тайтлов."""
-    list_display = ('name', 'category', 'genre', 'year')
-    search_fields = ('name', 'category', 'genre', 'year')
+    list_display = ('name', 'category', 'year')
+    search_fields = ('name', 'category', 'year')
 
 
 @admin.register(Category)
