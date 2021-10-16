@@ -54,6 +54,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["author"] = UserSerializer(instance.author).data['username']
+        return representation
+
 
     class Meta:
         model = Review
@@ -72,6 +77,11 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["author"] = UserSerializer(instance.author).data['username']
+        return representation
 
     class Meta:
         model = Comment
