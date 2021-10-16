@@ -59,7 +59,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         representation["author"] = UserSerializer(instance.author).data['username']
         return representation
 
-
     class Meta:
         model = Review
         fields = (
