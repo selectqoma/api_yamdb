@@ -114,12 +114,13 @@ class Review(models.Model):
     score = models.PositiveIntegerField(
         choices=SCORE_CHOICES,
         verbose_name='оценка',
-        unique=True
+
     )
     pub_date = models.DateField(auto_now_add=True)
 
     class Meta:
         ordering = ('-pub_date',)
+        unique_together = ('author', 'title')
 
     def __str__(self):
         return self.text[:50]
