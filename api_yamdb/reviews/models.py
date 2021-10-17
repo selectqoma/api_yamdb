@@ -1,10 +1,9 @@
 import datetime as dt
 
-from django.db import models
-from django.core.validators import MaxValueValidator, MaxLengthValidator
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxLengthValidator, MaxValueValidator
+from django.db import models
 from django.db.models import Avg
-
 
 User = get_user_model()
 

@@ -1,32 +1,28 @@
 import uuid
-from django.core.exceptions import PermissionDenied
-from rest_framework import filters, mixins, status, viewsets
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.views import APIView
 
-from reviews.models import Comment
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-import django_filters
-
+from rest_framework import filters, mixins, status, viewsets
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
-from .permissions import (
-    IsAdmin, IsModerator, IsAuthor,
-    IsAuthenticatedOrReadOnly, IsAdminOrReadOnly, AuthorOrReadOnlyPermission
-)
-from .serializers import (
-    SendCodeSerializer, LogInSerializer, UserSerializer, AdminUserSerializer,
-    CategorySerializer, GenreSerializer, TitleSerializer
-)
-from .serializers import ReviewSerializer, CommentSerializer
+
+from .filters import TitleFilter
+from .permissions import (AuthorOrReadOnlyPermission, IsAdmin,
+                          IsAdminOrReadOnly, IsAuthenticatedOrReadOnly)
+from .serializers import (AdminUserSerializer, CategorySerializer,
+                          CommentSerializer, GenreSerializer, LogInSerializer,
+                          ReviewSerializer, SendCodeSerializer,
+                          TitleSerializer, UserSerializer)
 
 
 @api_view(['POST'])
 def send_code(request):
+    """View-функция для отправки кода зарегестрированному пользователю."""
     serializer = SendCodeSerializer(data=request.data)
     email = request.data.get('email')
     username = request.data.get('username')
@@ -50,6 +46,7 @@ def send_code(request):
 
 @api_view(['POST'])
 def get_token(request):
+    """View-функция для получения токена авторизации."""
     serializer = LogInSerializer(data=request.data)
     if serializer.is_valid():
         username = serializer.data.get('username')
@@ -65,6 +62,7 @@ def get_token(request):
 
 
 class AdminViewSet(viewsets.ModelViewSet):
+    """View-set для админов."""
     queryset = User.objects.all()
     serializer_class = AdminUserSerializer
     filter_fields = ('role',)
@@ -75,6 +73,8 @@ class AdminViewSet(viewsets.ModelViewSet):
 
 
 class UserInfo(APIView):
+    """View-класс для получения информации о пользователи."""
+
     def get(self, request):
         if request.user.is_authenticated:
             user = get_object_or_404(User, username=request.user.username)
@@ -97,6 +97,7 @@ class UserInfo(APIView):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """View-set для отзывов."""
     serializer_class = ReviewSerializer
     permission_classes = [
         IsAuthenticatedOrReadOnly,
@@ -118,6 +119,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """View-set для комментариев."""
     serializer_class = CommentSerializer
     permission_classes = [
         IsAuthenticatedOrReadOnly,
@@ -138,6 +140,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
                    mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    """View-set для жанров."""
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
@@ -148,6 +151,7 @@ class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
 
 class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
                       mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    """View-set для категорий."""
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
@@ -156,19 +160,8 @@ class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     lookup_field = 'slug'
 
 
-class TitleFilter(django_filters.FilterSet):
-    genre = django_filters.CharFilter(field_name='genre__slug')
-    category = django_filters.CharFilter(field_name='category__slug')
-    name = django_filters.CharFilter(
-        field_name='name', lookup_expr='icontains')
-    year = django_filters.NumberFilter(field_name='year')
-
-    class Meta:
-        model = Title
-        fields = ('genre', 'category', 'name', 'year')
-
-
 class TitleViewSet(viewsets.ModelViewSet):
+    """View-set для тайтлов."""
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)

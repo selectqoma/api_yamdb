@@ -1,13 +1,12 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-
-from django.shortcuts import get_object_or_404
-
-from reviews.models import Comment, Category, Genre, Review, Title
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 
 
 class SendCodeSerializer(serializers.Serializer):
+    """Сериализатор для отправки кода."""
     email = serializers.EmailField(required=True)
     username = serializers.CharField(required=True)
 
@@ -29,11 +28,13 @@ class SendCodeSerializer(serializers.Serializer):
 
 
 class LogInSerializer(serializers.Serializer):
+    """Сериализатор для входа."""
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
 
 
 class AdminUserSerializer(serializers.ModelSerializer):
+    """Сериализатор для админов."""
     class Meta:
         model = User
         fields = ("first_name", "last_name", "username",
@@ -41,6 +42,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор для обычных пользователей."""
     class Meta:
         model = User
         fields = ['username',
@@ -54,9 +56,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """Сериализатор для обзоров."""
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation["author"] = UserSerializer(instance.author).data['username']
+        representation["author"] = UserSerializer(
+            instance.author).data['username']
         return representation
 
     class Meta:
@@ -76,10 +80,11 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-
+    """Сериализатор для комментариев."""
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation["author"] = UserSerializer(instance.author).data['username']
+        representation["author"] = UserSerializer(
+            instance.author).data['username']
         return representation
 
     class Meta:
@@ -91,6 +96,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
+    """Сериализатор для жанров."""
     slug = serializers.SlugField(
         max_length=50, required=True,
         validators=[UniqueValidator(queryset=Genre.objects.all())]
@@ -103,6 +109,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """Сериализатор для категорий."""
     slug = serializers.SlugField(
         max_length=50, required=True,
         validators=[UniqueValidator(queryset=Category.objects.all())]
@@ -115,6 +122,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    """Сериализатор для тайтлов."""
     category_read = CategorySerializer(read_only=True, source='category')
     genre_read = GenreSerializer(many=True, read_only=True, source='genre')
     rating = serializers.IntegerField(read_only=True)
