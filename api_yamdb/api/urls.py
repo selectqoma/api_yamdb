@@ -1,11 +1,9 @@
-from django.db.models import base
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from .views import (
-    send_code, get_token, AdminViewSet, CommentViewSet,
-    CategoryViewSet, GenreViewSet,
-    ReviewViewSet, UserInfo, TitleViewSet
-)
+
+from .views import (AdminViewSet, CategoryViewSet, CommentViewSet,
+                    GenreViewSet, ReviewViewSet, TitleViewSet, UserInfo,
+                    get_token, send_code)
 
 router = DefaultRouter()
 router.register('users', AdminViewSet)

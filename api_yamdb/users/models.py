@@ -7,6 +7,8 @@ USER = 'user'
 
 
 class UserManager(BaseUserManager):
+    """Менеджер для работы с моделью User."""
+
     def create_user(self, email, username, **extra_fields):
         if not email:
             raise ValueError('Введите адрес электронной почты')
@@ -39,12 +41,12 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-
+    """Кастомная модель User."""
     USER_ROLES = [
-            (ADMIN, 'Администратор'),
-            (MODERATOR, 'Модератор'),
-            (USER, 'Пользователь'),
-        ]
+        (ADMIN, 'Администратор'),
+        (MODERATOR, 'Модератор'),
+        (USER, 'Пользователь'),
+    ]
 
     email = models.EmailField(
         max_length=254,
@@ -100,7 +102,7 @@ class User(AbstractUser):
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email',]
+    REQUIRED_FIELDS = ['email', ]
 
     def __str__(self):
         return self.username
