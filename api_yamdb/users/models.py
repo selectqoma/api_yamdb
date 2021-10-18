@@ -42,7 +42,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     """Кастомная модель User."""
-    USER_ROLES = [
+    ROLE_CHOICES = [
         (ADMIN, 'Администратор'),
         (MODERATOR, 'Модератор'),
         (USER, 'Пользователь'),
@@ -65,13 +65,11 @@ class User(AbstractUser):
         max_length=150,
         verbose_name='Имя',
         blank=True,
-        null=True
     )
     last_name = models.CharField(
         max_length=150,
         verbose_name='Фамилия',
         blank=True,
-        null=True
     )
 
     bio = models.TextField(
@@ -83,7 +81,7 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=10,
         verbose_name='Тип пользователя',
-        choices=USER_ROLES,
+        choices=ROLE_CHOICES,
         default=USER,
     )
 

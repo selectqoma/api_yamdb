@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
 
@@ -41,7 +42,9 @@ def send_code(request):
         return Response(
             request.data,
             status=status.HTTP_200_OK)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(
+        serializer.errors,
+        status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])

@@ -8,12 +8,12 @@ load_dotenv()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-SECRET_KEY = 'p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS')]
 
 
 INSTALLED_APPS = [

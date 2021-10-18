@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 
@@ -37,21 +38,21 @@ class AdminUserSerializer(serializers.ModelSerializer):
     """Сериализатор для админов."""
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "username",
-                  "bio", "email", "role")
+        fields = ('first_name', 'last_name', 'username',
+                  'bio', 'email', 'role')
 
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализатор для обычных пользователей."""
     class Meta:
         model = User
-        fields = ['username',
+        fields = ('username',
                   'email',
                   'bio',
                   'first_name',
                   'last_name',
                   'role'
-                  ]
+                  )
         read_only_fields = ('role',)
 
 
@@ -59,7 +60,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор для обзоров."""
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation["author"] = UserSerializer(
+        representation['author'] = UserSerializer(
             instance.author).data['username']
         return representation
 
@@ -83,7 +84,7 @@ class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для комментариев."""
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation["author"] = UserSerializer(
+        representation['author'] = UserSerializer(
             instance.author).data['username']
         return representation
 

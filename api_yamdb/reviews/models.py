@@ -17,11 +17,10 @@ class Category(models.Model):
     slug = models.SlugField(
         verbose_name='Slug',
         unique=True,
-        max_length=50
     )
 
     class Meta:
-        ordering = ('slug',)
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -38,11 +37,10 @@ class Genre(models.Model):
     slug = models.SlugField(
         verbose_name='Slug',
         unique=True,
-        max_length=50
     )
 
     class Meta:
-        ordering = ('slug',)
+        ordering = ('name',)
 
     def __str__(self):
         return self.slug
