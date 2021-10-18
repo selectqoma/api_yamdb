@@ -1,9 +1,10 @@
 import datetime as dt
 
 from django.contrib.auth import get_user_model
-from django.core.validators import MaxLengthValidator, MaxValueValidator
+from django.core.validators import MaxLengthValidator
 from django.db import models
-from django.db.models import Avg
+from django.db.models import Avg, UniqueConstraint
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -61,10 +62,7 @@ class Title(models.Model):
     )
 
     name = models.CharField(verbose_name='Название', max_length=256)
-    year = models.PositiveIntegerField(
-        validators=[MaxValueValidator(
-            dt.datetime.today().year, message='Неверная дата'), ]
-    )
+    year = models.PositiveIntegerField()
 
     @property
     def rating(self):
@@ -83,6 +81,12 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.year > dt.datetime.today().year:
+            raise ValidationError('Неверный год')
+        super().save(*args, **kwargs)
+
 
 
 class Review(models.Model):
@@ -117,7 +121,12 @@ class Review(models.Model):
 
     class Meta:
         ordering = ('-pub_date',)
-        unique_together = ('author', 'title')
+        constraints = [
+            UniqueConstraint(
+                fields=('author', 'title'),
+                name='unique_author_review'
+            )
+        ]
 
     def __str__(self):
         return self.text[:50]
