@@ -32,7 +32,7 @@ class Genre(models.Model):
         verbose_name='Название',
         max_length=256,
         blank=True,
-        null=True
+        default='без жанра'
     )
     slug = models.SlugField(
         verbose_name='Slug',
