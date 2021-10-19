@@ -21,6 +21,8 @@ class Category(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Категория',
+        verbose_name_plural = 'Категории',
         ordering = ('name',)
 
     def __str__(self):
@@ -41,6 +43,8 @@ class Genre(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Жанр',
+        verbose_name_plural = 'Жанры',
         ordering = ('name',)
 
     def __str__(self):
@@ -54,14 +58,18 @@ class Title(models.Model):
         on_delete=models.SET_NULL,
         related_name='titles',
         null=True,
+        verbose_name='Категрия'
     )
     genre = models.ManyToManyField(
         Genre,
         related_name='titles',
         blank=True,
+        verbose_name='Жанр'
     )
 
-    name = models.CharField(verbose_name='Название', max_length=256)
+    name = models.CharField(
+        verbose_name='Название',
+        max_length=256)
     year = models.PositiveIntegerField()
 
     @property
@@ -72,11 +80,14 @@ class Title(models.Model):
         return score['score__avg']
 
     description = models.TextField(
+        verbose_name='Описание',
         blank=True,
         null=True
     )
 
     class Meta:
+        verbose_name = 'Тайтл',
+        verbose_name_plural = 'Тайтлы',
         ordering = ('-year',)
 
     def __str__(self):
@@ -86,7 +97,6 @@ class Title(models.Model):
         if self.year > dt.datetime.today().year:
             raise ValidationError('Неверный год')
         super().save(*args, **kwargs)
-
 
 
 class Review(models.Model):
@@ -109,17 +119,19 @@ class Review(models.Model):
         verbose_name='Автор',
     )
     text = models.TextField(
-        'Текст отзыва',
+        verbose_name='Текст',
         validators=[MaxLengthValidator(90000, message='Превышен лимит знаков')]
     )
     score = models.PositiveIntegerField(
         choices=SCORE_CHOICES,
-        verbose_name='оценка',
+        verbose_name='Оценка',
 
     )
     pub_date = models.DateField(auto_now_add=True)
 
     class Meta:
+        verbose_name = 'Отзыв',
+        verbose_name_plural = 'Отзывы',
         ordering = ('-pub_date',)
         constraints = [
             UniqueConstraint(
@@ -156,6 +168,8 @@ class Comment(models.Model):
     pub_date = models.DateField(auto_now_add=True)
 
     class Meta:
+        verbose_name = 'Коментарий',
+        verbose_name_plural = 'Коментарии'
         ordering = ('-pub_date',)
 
     def __str__(self):
