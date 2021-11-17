@@ -7,13 +7,13 @@ from users.models import User
 
 
 class SendCodeSerializer(serializers.Serializer):
-    """Сериализатор для отправки кода."""
+    """Serializer for sending code by e-mail"""
     email = serializers.EmailField(required=True)
     username = serializers.CharField(required=True)
 
     def validate_username(self, value):
         if value == 'me':
-            raise serializers.ValidationError('Неверное имя пользователя')
+            raise serializers.ValidationError('Incorrect username')
         return value
 
     def validate(self, attrs):
@@ -22,20 +22,20 @@ class SendCodeSerializer(serializers.Serializer):
         email_exists = User.objects.filter(
             email=attrs['email']).exists()
         if username_exists and not email_exists:
-            raise serializers.ValidationError('Такой пользователь уже есть')
+            raise serializers.ValidationError('User already exists')
         if email_exists and not username_exists:
-            raise serializers.ValidationError('Такой пользователь уже есть')
+            raise serializers.ValidationError('User already exists')
         return attrs
 
 
 class LogInSerializer(serializers.Serializer):
-    """Сериализатор для входа."""
+    """Serializer for logging in"""
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
 
 
 class AdminUserSerializer(serializers.ModelSerializer):
-    """Сериализатор для админов."""
+    """Serializer for admin"""
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'username',
@@ -43,7 +43,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Сериализатор для обычных пользователей."""
+    """Serializer for simple users"""
     class Meta:
         model = User
         fields = ('username',
@@ -57,7 +57,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    """Сериализатор для обзоров."""
+    """Serializer for reviews"""
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['author'] = UserSerializer(
@@ -81,7 +81,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    """Сериализатор для комментариев."""
+    """Serializer for comments"""
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['author'] = UserSerializer(
@@ -97,7 +97,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    """Сериализатор для жанров."""
+    """Serializer for the genres"""
     slug = serializers.SlugField(
         max_length=50, required=True,
         validators=[UniqueValidator(queryset=Genre.objects.all())]
@@ -110,7 +110,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    """Сериализатор для категорий."""
+    """Serializer for categories"""
     slug = serializers.SlugField(
         max_length=50, required=True,
         validators=[UniqueValidator(queryset=Category.objects.all())]
@@ -123,7 +123,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    """Сериализатор для тайтлов."""
+    """Serializer for titles"""
     category_read = CategorySerializer(read_only=True, source='category')
     genre_read = GenreSerializer(many=True, read_only=True, source='genre')
     rating = serializers.IntegerField(read_only=True)

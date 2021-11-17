@@ -2,7 +2,7 @@ from rest_framework import permissions
 
 
 class IsAuthenticatedOrReadOnly(permissions.BasePermission):
-    """Неавторизованные пользователи доступно только чтение."""
+    """Read only for unauthenticated users"""
 
     def has_permission(self, request, view):
         return (
@@ -12,14 +12,14 @@ class IsAuthenticatedOrReadOnly(permissions.BasePermission):
 
 
 class IsAuthor(permissions.BasePermission):
-    """Проверяет, является ли пользователь автором."""
+    """Checks if user == author"""
 
     def has_object_permission(self, request, view, obj):
         return request.user == obj.author
 
 
 class IsModerator(permissions.BasePermission):
-    """Проверяет, является ли пользователь модератором."""
+    """Checks if user == moderator"""
 
     def has_permission(self, request, view):
         return (
@@ -29,7 +29,7 @@ class IsModerator(permissions.BasePermission):
 
 
 class IsAdmin(permissions.BasePermission):
-    """Проверяет, является ли пользователь админом."""
+    """Checks if user == admin"""
 
     def has_permission(self, request, view):
         return (
@@ -40,7 +40,7 @@ class IsAdmin(permissions.BasePermission):
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
-    """Проверяет, является ли пользователь админом."""
+    """Checks if user is admin and if not gives only read access"""
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
@@ -53,8 +53,8 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 
 
 class AuthorOrReadOnlyPermission(permissions.BasePermission):
-    """Проверяет, является ли пользователь автором объекта,
-    модератором или админом."""
+    """Checks if user is the author of the object,
+     moderator or admin"""
 
     def has_object_permission(self, request, view, obj):
         return (

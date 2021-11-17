@@ -7,13 +7,13 @@ USER = 'user'
 
 
 class UserManager(BaseUserManager):
-    """Менеджер для работы с моделью User."""
+    """Manager for the User model"""
 
     def create_user(self, email, username, **extra_fields):
         if not email:
-            raise ValueError('Введите адрес электронной почты')
+            raise ValueError('Enter your email')
         if not username:
-            raise ValueError('Введите имя пользователя')
+            raise ValueError('Enter your username')
         user = self.model(
             email=self.normalize_email(email),
             username=username,
@@ -24,9 +24,9 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, email, username, password, **extra_fields):
         if not email:
-            raise ValueError('Введите адрес электронной почты')
+            raise ValueError('Enter your email')
         if not username:
-            raise ValueError('Введите имя пользователя')
+            raise ValueError('Enter your username')
         user = self.model(
             email=self.normalize_email(email),
             username=username,
@@ -41,52 +41,52 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    """Кастомная модель User."""
+    """Custom user model."""
     ROLE_CHOICES = [
-        (ADMIN, 'Администратор'),
-        (MODERATOR, 'Модератор'),
-        (USER, 'Пользователь'),
+        (ADMIN, 'Admin'),
+        (MODERATOR, 'Moderator'),
+        (USER, 'User'),
     ]
 
     email = models.EmailField(
         max_length=254,
-        verbose_name='Адрес электронной почты',
+        verbose_name='Email',
         unique=True,
         blank=False,
         null=False
     )
 
     username = models.CharField(
-        verbose_name='Имя пользователя',
+        verbose_name='Username',
         max_length=50,
         unique=True)
 
     first_name = models.CharField(
         max_length=150,
-        verbose_name='Имя',
+        verbose_name='Name',
         blank=True,
     )
     last_name = models.CharField(
         max_length=150,
-        verbose_name='Фамилия',
+        verbose_name='Last name',
         blank=True,
     )
 
     bio = models.TextField(
-        verbose_name='Описание',
+        verbose_name='Description',
         max_length=500,
         blank=True,
     )
 
     role = models.CharField(
         max_length=10,
-        verbose_name='Тип пользователя',
+        verbose_name='User type',
         choices=ROLE_CHOICES,
         default=USER,
     )
 
     confirmation_code = models.UUIDField(
-        verbose_name='Код подтверждения',
+        verbose_name='Confirmation code',
         default=0,
         editable=False,
     )
@@ -107,5 +107,5 @@ class User(AbstractUser):
 
     class Meta:
         ordering = ('username',)
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'

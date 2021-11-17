@@ -25,7 +25,7 @@ from .serializers import (AdminUserSerializer, CategorySerializer,
 
 @api_view(['POST'])
 def send_code(request):
-    """View-функция для отправки кода зарегестрированному пользователю."""
+    """View for sending code to a registered user"""
     serializer = SendCodeSerializer(data=request.data)
     email = request.data.get('email')
     username = request.data.get('username')
@@ -37,7 +37,7 @@ def send_code(request):
             user.confirmation_code = confirmation_code
         else:
             User.objects.create_user(email=email, username=username)
-        mail_subject = 'API_Yamdb: Ваш код для авторизации'
+        mail_subject = 'API_Yamdb: Your authentication code'
         mail_message = f'Скопируйте код: {confirmation_code}'
         send_mail(mail_subject, mail_message, 'API_Yamdb <admin@yamdb.ru>',
                   (email,), fail_silently=True)
@@ -51,7 +51,7 @@ def send_code(request):
 
 @api_view(['POST'])
 def get_token(request):
-    """View-функция для получения токена авторизации."""
+    """View for getting the authentication token"""
     serializer = LogInSerializer(data=request.data)
     if serializer.is_valid():
         username = serializer.data.get('username')
@@ -59,15 +59,15 @@ def get_token(request):
         user = get_object_or_404(User, username=username)
         if confirmation_code == str(user.confirmation_code):
             token = RefreshToken.for_user(user)
-            return Response({f'Ваш токен: {token.access_token}'},
+            return Response({f'Your token: {token.access_token}'},
                             status=status.HTTP_200_OK)
-        return Response('Неправильный код',
+        return Response('Wrong code',
                         status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AdminViewSet(viewsets.ModelViewSet):
-    """View-set для админов."""
+    """View-set for admins"""
     queryset = User.objects.all()
     serializer_class = AdminUserSerializer
     filter_fields = ('role',)
@@ -78,14 +78,13 @@ class AdminViewSet(viewsets.ModelViewSet):
 
 
 class UserInfo(APIView):
-    """View-класс для получения информации о пользователи."""
-
+    """View for getting user info"""
     def get(self, request):
         if request.user.is_authenticated:
             user = get_object_or_404(User, username=request.user.username)
             serializer = UserSerializer(user)
             return Response(serializer.data)
-        return Response('Вы не авторизированы',
+        return Response('You are not authenticated',
                         status=status.HTTP_401_UNAUTHORIZED)
 
     def patch(self, request):
@@ -97,12 +96,12 @@ class UserInfo(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
-        return Response('Вы не авторизированы',
+        return Response('You are not authenticated',
                         status=status.HTTP_401_UNAUTHORIZED)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    """View-set для отзывов."""
+    """View for the reviews"""
     serializer_class = ReviewSerializer
     permission_classes = [
         IsAuthenticatedOrReadOnly,
@@ -124,7 +123,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    """View-set для комментариев."""
+    """View for comments"""
     serializer_class = CommentSerializer
     permission_classes = [
         IsAuthenticatedOrReadOnly,
@@ -144,7 +143,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class GenreViewSet(CustomMixin):
-    """View-set для жанров."""
+    """View for genres"""
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
@@ -154,7 +153,7 @@ class GenreViewSet(CustomMixin):
 
 
 class CategoryViewSet(CustomMixin):
-    """View-set для категорий."""
+    """View for categories"""
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
@@ -164,7 +163,7 @@ class CategoryViewSet(CustomMixin):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    """View-set для тайтлов."""
+    """View for titles"""
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)

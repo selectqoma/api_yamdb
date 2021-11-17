@@ -1,72 +1,72 @@
-**Проект YaMDb**
+**Project YaMDb**
 
-Проект YaMDb собирает отзывы (Review) пользователей на произведения (Title).
+YaMDb Project
 
-Произведения делятся на категории: «Книги», «Фильмы», «Музыка».
+The YaMDb project collects user reviews.
 
-Список категорий (Category) может быть расширен (например, можно добавить категорию «Изобразительное искусство» или «Ювелирка»).
+There are different categories like: "Books", "Films", "Music".
 
-Сами произведения в YaMDb не хранятся, здесь нельзя посмотреть фильм или послушать музыку.
+The list of categories (Category) can be expanded (for example, you can add the category "Fine Arts" or "Jewelry").
 
-В каждой категории есть произведения: книги, фильмы или музыка. Например, в категории «Книги» могут быть произведения «Винни Пух и все-все-все» и «Марсианские хроники», а в категории «Музыка» — песня «Давеча» группы «Насекомые» и вторая сюита Баха. Произведению может быть присвоен жанр из списка предустановленных (например, «Сказка», «Рок» или «Артхаус»). Новые жанры может создавать только администратор. Благодарные или возмущённые читатели оставляют к произведениям текстовые отзывы (Review) и выставляют произведению рейтинг (оценку в диапазоне от одного до десяти). Из множества оценок автоматически высчитывается средняя оценка произведения.
+The works themselves are not stored in YaMDb; you cannot watch a movie or listen to music here.
 
-**Ресурсы API YaMDb**
+**API YaMDb Resources **
 
-_USERS_: пользователи.
+YaMDb API Resources
 
-_TITLES_: произведения, к которым пишут отзывы (определённый фильм, книга или песенка).
+USERS: users.
 
-_CATEGORIES_: категории (типы) произведений («Фильмы», «Книги», «Музыка»).
+TITLES: titles that are being reviewed (a specific movie, book or song).
 
-_GENRES_: жанры произведений. Одно произведение может быть привязано к нескольким жанрам.
+CATEGORIES: categories (types) of works ("Films", "Books", "Music").
 
-_REVIEWS_: отзывы на произведения. Отзыв привязан к определённому произведению.
+GENRES: genres of works. One work can be linked to several genres.
 
-_COMMENTS_: комментарии к отзывам. Комментарий привязан к определённому отзыву.
+REVIEWS: reviews of works. The review is tied to a specific work.
 
-**Алгоритм регистрации пользователей**
+COMMENTS: Comments on reviews. The comment is linked to a specific review.
 
-- Пользователь отправляет POST-запрос с параметрами username и email на /api/v1/auth/email/
+**User registration algorithm**
 
-- Yamdb отправляет письмо с кодом подтверждения на введенный адрес email. 
+- The user sends a POST request with the parameters username and email to / api / v1 / auth / email /
+
+- Yamdb sends an email with a confirmation code to the entered email address.
   
-- Пользователь отправляет POST-запрос с параметрами username и confirmation_code (полученный по почте) на /api/v1/auth/token/
+- The user sends a POST request with the parameters username and confirmation_code (received by mail) to / api / v1 / auth / token /
 
-- В ответ на запрос ему приходит token (JWT-токен). Эти операции выполняются один раз, при регистрации пользователя.
+- In response to the request, he receives a token (JWT token). These operations are performed once, when a user is registered.
   
-- В результате пользователь получает токен и может работать с API, отправляя этот токен с каждым запросом.
+- As a result, the user receives a token and can work with the API, sending this token with each request.Для обновления токена, нужно отправить повторный запрос на /api/v1/auth/email/ со своими username и email
 
-Для обновления токена, нужно отправить повторный запрос на /api/v1/auth/email/ со своими username и email
+**User Roles:**
 
-**Пользовательские роли:**
+_Anonymous_ - can view descriptions of works, read reviews and comments.
 
-_Аноним_ — может просматривать описания произведений, читать отзывы и комментарии.
+_Authenticated user_ (user) - can read everything, like Anonymous, additionally can publish reviews and rate works (films / books / songs), can comment on other people's reviews and rate them; can edit and delete their reviews and comments.
 
-_Аутентифицированный пользователь_ (user) — может читать всё, как и Аноним, дополнительно может публиковать отзывы и ставить рейтинг произведениям (фильмам/книгам/песенкам), может комментировать чужие отзывы и ставить им оценки; может редактировать и удалять свои отзывы и комментарии.
+_Moderator_ (moderator) - the same rights as the Authenticated user, plus the right to delete and edit any reviews and comments.
 
-_Модератор_ (moderator) — те же права, что и у Аутентифицированного пользователя плюс право удалять и редактировать любые отзывы и комментарии.
+_Administrator_ (admin) - full rights to manage the project and all its contents. Can create and delete works, categories and genres. Can assign roles to users.
 
-_Администратор_ (admin) — полные права на управление проектом и всем его содержимым. Может создавать и удалять произведения, категории и жанры. Может назначать роли пользователям.
+_Superuser _ - the same rights as the Administrator, except that even if he changes the role to _user_, he will retain administrator rights
 
-_Cуперюзер(superuser)_ — те же права, что и у Администратора кроме того что даже если ему поменять роль на _user_ он сохранит права администратора
+* How to install: **
 
-**Как установить:** 
+Clone the repository.
 
-Склонируйте репозиторий. 
+Create a virtual environment python -m venv venv in the main project folder
 
-Создайте виртуальное окружение python -m venv venv в главной папке проекта
+Activate virtual environment
 
-Активируйте виртуальное окружение 
-
-- Windows: `source venv\scripts\activate`
-- Linux/Mac: `source venv/bin/activate `
+- Windows: `source venv \ scripts \ activate`
+- Linux / Mac: `source venv / bin / activate`
   
-Установите зависимости командой python -m pip install -r requirements.txt
+Install the requirements with python -m pip install -r requirements.txt
 
-Выполните миграции в базу данных:
+Perform migrations to the database:
 
 `python manage.py makemigrations`
 `python manage.py migrate`
 
-Запустите проэкт командой:
-
+Run the project with the command:
+`python manage.py runserver`

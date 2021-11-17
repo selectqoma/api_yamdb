@@ -5,21 +5,21 @@ from .models import Category, Comment, Genre, Review, Title
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
-    """Админка для жанров."""
+    """Admin access for genres"""
     list_display = ('slug',)
     search_fields = ('slug',)
 
 
 @admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
-    """Админка для тайтлов."""
+    """Admin access for titles"""
     list_display = ('name', 'category', 'year')
     search_fields = ('name', 'category', 'year')
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    """Админка для категорий."""
+    """Admin access for categories"""
     list_display = ('slug', 'name')
     search_fields = ('slug', 'name')
 
@@ -30,7 +30,7 @@ class CommentInLine(admin.TabularInline):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    """Адмнка для обзоров."""
+    """Admin access for reviews"""
     list_display = ('title', 'author', 'text', 'pub_date')
     search_fields = ('title', 'author', 'text')
     inlines = [CommentInLine, ]
