@@ -1,5 +1,4 @@
-[
-    {
+{
         "encoder": 0,
         "battery": 85.6,
         "data": [
@@ -6878,5 +6877,4 @@
             "angle": 224,
             "number_satellites": 6
         }
-    }
-]
+}
